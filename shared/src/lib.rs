@@ -1,29 +1,40 @@
 #![allow(dead_code)]
 
+use serde::Serialize;
 use specta::Type;
+
+#[derive(Debug, Type, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum TaskStatus {
+    Pending,
+    InProgress,
+    Done,
+}
 
 #[derive(Debug, Type)]
 pub struct SubTask {
     id: u32,
+    parent: u32,
     title: String,
-    completed: bool,
+    status: TaskStatus,
     description: String,
 }
 
 #[derive(Debug, Type)]
 pub struct Task {
     id: u32,
+    parent: u32,
     title: String,
-    completed: bool,
+    status: TaskStatus,
     description: String,
     subtasks: Vec<SubTask>,
 }
 
 #[derive(Debug, Type)]
-pub struct Project {
+pub struct Stage {
     id: u32,
     title: String,
-    completed: bool,
+    status: TaskStatus,
     tasks: Vec<Task>,
 }
 
@@ -31,5 +42,9 @@ pub struct Project {
 pub enum WsEvent {
     AddTask(Task),
     UpdateTask(Task),
-    DeleteTask(u32),
+    AddSubTask(SubTask),
+    UpdateSubTask(SubTask),
+    AddStage(Stage),
+    UpdateStage(Stage),
+    Delete(u32),
 }

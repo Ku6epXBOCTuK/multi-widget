@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use shared::{Project, SubTask, Task, WsEvent};
+use shared::{Stage, SubTask, Task, WsEvent};
 use specta::Types;
 use specta_typescript::Typescript;
 
@@ -8,7 +8,7 @@ fn main() {
     let types = Types::default()
         .register::<Task>()
         .register::<SubTask>()
-        .register::<Project>()
+        .register::<Stage>()
         .register::<WsEvent>();
 
     let output_path = "./frontend/src/lib/generated-bindings.ts";
