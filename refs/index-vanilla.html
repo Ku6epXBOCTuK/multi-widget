@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYBER_TASK // TERMINAL</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.0/index.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="header-row">
+            <div class="header-title">Привет, <span class="glow-text-subtle">КиберХвостик</span></div>
+            <div class="header-clock">
+              <span id="clock">00:00:00</span>
+            </div>
+          </div>
+          <div class="sub-header">
+            <span><span class="sub-header-icon">></span> Текущие задачи</span>
+            <span class="task-count" id="taskCount">0 объектов</span>
+          </div>
+        </div>
+        <div id="taskList" class="panel-divider">
+          <!-- Tasks will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const tasks = [
+        {
+          id: 1,
+          title: "Обновить протоколы безопасности",
+          description:
+            "Комплексная проверка сетевых интерфейсов. Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime id voluptatibus ex pariatur mollitia velit dolorem commodi aliquid, praesentium atque laboriosam, temporibus libero cum, a quaerat quo autem saepe cupiditate.",
+          status: "in-progress",
+          subtasks: [
+            { id: 101, title: "Проверить порт 8080", status: "done" },
+            { id: 102, title: "Проверить порт 443", status: "in-progress" },
+            { id: 103, title: "Обновить SSL сертификаты", status: "pending" },
+          ],
+        },
+        {
+          id: 2,
+          title: "Дефрагментация базы данных",
+          description: "",
+          status: "pending",
+          subtasks: [],
+        },
+        {
+          id: 3,
+          title: "Архивировать старые логи",
+          description: "Перенести данные за 2024 год в холодное хранилище",
+          status: "done",
+          subtasks: [
+            { id: 301, title: "Сжать архивы", status: "done" },
+            { id: 302, title: "Загрузить на внешний сервер", status: "done" },
+          ],
+        },
+        {
+          id: 4,
+          title: "Оптимизация нейросети",
+          description: "Снизить потребление ресурсов на 15% к концу недели",
+          status: "in-progress",
+          subtasks: [
+            { id: 401, title: "Анализ узких мест", status: "done" },
+            { id: 402, title: "Рефакторинг модуля предсказаний", status: "in-progress" },
+          ],
+        },
+      ];
+
+      function updateClock() {
+        const now = new Date();
+        document.getElementById("clock").innerText = now.toLocaleTimeString("ru-RU", { hour12: false });
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      const statusConfig = {
+        pending: { label: "Ожидание", dotClass: "status-pending", textClass: "status-label-pending", icon: "[ ]" },
+        "in-progress": { label: "В процессе", dotClass: "status-in-progress", textClass: "shimmer-text", icon: "[/]" },
+        done: { label: "Завершено", dotClass: "status-done", textClass: "status-label-done", icon: "[✓]" },
+      };
+
+      const subtaskIconConfig = {
+        pending: { class: "subtask-icon-pending", icon: "[ ]" },
+        "in-progress": { class: "subtask-icon-progress", icon: "[/]" },
+        done: { class: "subtask-icon-done", icon: "[✓]" },
+      };
+
+      function renderTasks() {
+        const list = document.getElementById("taskList");
+        const count = document.getElementById("taskCount");
+        list.innerHTML = "";
+
+        count.innerText = `${tasks.length} ${getNoun(tasks.length, "задача", "задачи", "задач")}`;
+
+        tasks.forEach((task, index) => {
+          const config = statusConfig[task.status];
+          const isDone = task.status === "done";
+          const isInProgress = task.status === "in-progress";
+
+          const taskEl = document.createElement("div");
+          taskEl.className = `task-item ${isInProgress ? "is-in-progress" : ""} ${isDone ? "is-done" : ""}`;
+          taskEl.style.animationDelay = `${index * 0.1}s`;
+
+          let subtasksHtml = "";
+          if (task.subtasks && task.subtasks.length > 0) {
+            subtasksHtml = `
+              <div class="subtask-tree">
+                ${task.subtasks
+                  .map((sub) => {
+                    const subIcon = subtaskIconConfig[sub.status];
+                    const isSubDone = sub.status === "done";
+                    return `
+                      <div class="subtask-item">
+                        <span class="subtask-icon ${subIcon.class}">${subIcon.icon}</span>
+                        <span class="subtask-title ${isSubDone ? "is-done" : ""}">
+                          ${escapeHtml(sub.title)}
+                        </span>
+                      </div>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            `;
+          }
+
+          taskEl.innerHTML = `
+            <div class="task-content">
+              <div class="task-header">
+                <span class="status-dot ${config.dotClass}"></span>
+                <h3 class="task-title ${isDone ? "is-done" : ""}">
+                  ${escapeHtml(task.title)}
+                </h3>
+              </div>
+              ${task.description ? `<p class="task-description">${escapeHtml(task.description)}</p>` : ""}
+              ${subtasksHtml}
+              <div class="task-status ${config.textClass}">
+                ${config.label}
+              </div>
+            </div>
+          `;
+          list.appendChild(taskEl);
+        });
+      }
+
+      function getNoun(number, one, two, five) {
+        let n = Math.abs(number);
+        n %= 100;
+        if (n >= 5 && n <= 20) return five;
+        n %= 10;
+        if (n === 1) return one;
+        if (n >= 2 && n <= 4) return two;
+        return five;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      renderTasks();
+    </script>
+  </body>
+</html>

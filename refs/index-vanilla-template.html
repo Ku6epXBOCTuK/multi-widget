@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYBER_TASK // TERMINAL</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.0/index.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="header-row">
+            <div class="header-title">Привет, <span class="glow-text-subtle">КиберХвостик</span></div>
+            <div class="header-clock">
+              <span id="clock">00:00:00</span>
+            </div>
+          </div>
+          <div class="sub-header">
+            <span><span class="sub-header-icon">></span> Текущие задачи</span>
+            <span class="task-count" id="taskCount">0 объектов</span>
+          </div>
+        </div>
+        <div id="taskList" class="panel-divider"></div>
+      </div>
+    </div>
+
+    <template id="task-template">
+      <div class="task-item">
+        <div class="task-content">
+          <div class="task-header">
+            <span class="status-dot"></span>
+            <h3 class="task-title"></h3>
+          </div>
+          <p class="task-description"></p>
+          <div class="subtask-tree"></div>
+          <div class="task-status"></div>
+        </div>
+      </div>
+    </template>
+
+    <template id="subtask-template">
+      <div class="subtask-item">
+        <span class="subtask-icon"></span>
+        <span class="subtask-title"></span>
+      </div>
+    </template>
+
+    <script>
+      const tasks = [
+        {
+          id: 1,
+          title: "Обновить протоколы безопасности",
+          description:
+            "Комплексная проверка сетевых интерфейсов. Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime id voluptatibus ex pariatur mollitia velit dolorem commodi aliquid, praesentium atque laboriosam, temporibus libero cum, a quaerat quo autem saepe cupiditate.",
+          status: "in-progress",
+          subtasks: [
+            { id: 101, title: "Проверить порт 8080", status: "done" },
+            { id: 102, title: "Проверить порт 443", status: "in-progress" },
+            { id: 103, title: "Обновить SSL сертификаты", status: "pending" },
+          ],
+        },
+        {
+          id: 2,
+          title: "Дефрагментация базы данных",
+          description: "",
+          status: "pending",
+          subtasks: [],
+        },
+        {
+          id: 3,
+          title: "Архивировать старые логи",
+          description: "Перенести данные за 2024 год в холодное хранилище",
+          status: "done",
+          subtasks: [
+            { id: 301, title: "Сжать архивы", status: "done" },
+            { id: 302, title: "Загрузить на внешний сервер", status: "done" },
+          ],
+        },
+        {
+          id: 4,
+          title: "Оптимизация нейросети",
+          description: "Снизить потребление ресурсов на 15% к концу недели",
+          status: "in-progress",
+          subtasks: [
+            { id: 401, title: "Анализ узких мест", status: "done" },
+            { id: 402, title: "Рефакторинг модуля предсказаний", status: "in-progress" },
+          ],
+        },
+      ];
+
+      function updateClock() {
+        const now = new Date();
+        document.getElementById("clock").textContent = now.toLocaleTimeString("ru-RU", { hour12: false });
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      const statusConfig = {
+        pending: { label: "Ожидание", dotClass: "status-pending", textClass: "status-label-pending" },
+        "in-progress": { label: "В процессе", dotClass: "status-in-progress", textClass: "shimmer-text" },
+        done: { label: "Завершено", dotClass: "status-done", textClass: "status-label-done" },
+      };
+
+      const subtaskIconConfig = {
+        pending: { class: "subtask-icon-pending", icon: "[ ]" },
+        "in-progress": { class: "subtask-icon-progress", icon: "[/]" },
+        done: { class: "subtask-icon-done", icon: "[✓]" },
+      };
+
+      function getNoun(number, one, two, five) {
+        let n = Math.abs(number);
+        n %= 100;
+        if (n >= 5 && n <= 20) return five;
+        n %= 10;
+        if (n === 1) return one;
+        if (n >= 2 && n <= 4) return two;
+        return five;
+      }
+
+      function renderTasks() {
+        const list = document.getElementById("taskList");
+        const count = document.getElementById("taskCount");
+        list.innerHTML = "";
+
+        count.textContent = `${tasks.length} ${getNoun(tasks.length, "задача", "задачи", "задач")}`;
+
+        const taskTemplate = document.getElementById("task-template");
+        const subtaskTemplate = document.getElementById("subtask-template");
+
+        for (let i = 0; i < tasks.length; i++) {
+          const task = tasks[i];
+          const config = statusConfig[task.status];
+          const isDone = task.status === "done";
+          const isInProgress = task.status === "in-progress";
+
+          const taskEl = taskTemplate.content.firstElementChild.cloneNode(true);
+          taskEl.style.animationDelay = `${i * 0.1}s`;
+
+          if (isInProgress) taskEl.classList.add("is-in-progress");
+          if (isDone) taskEl.classList.add("is-done");
+
+          const titleEl = taskEl.querySelector(".task-title");
+          titleEl.textContent = task.title;
+          if (isDone) titleEl.classList.add("is-done");
+
+          const dotEl = taskEl.querySelector(".status-dot");
+          dotEl.classList.add(config.dotClass);
+
+          const descEl = taskEl.querySelector(".task-description");
+          if (task.description) {
+            descEl.textContent = task.description;
+          } else {
+            descEl.remove();
+          }
+
+          const treeEl = taskEl.querySelector(".subtask-tree");
+          if (task.subtasks && task.subtasks.length > 0) {
+            for (const sub of task.subtasks) {
+              const subEl = subtaskTemplate.content.firstElementChild.cloneNode(true);
+              const subConfig = subtaskIconConfig[sub.status];
+              const isSubDone = sub.status === "done";
+
+              const iconEl = subEl.querySelector(".subtask-icon");
+              iconEl.classList.add(subConfig.class);
+              iconEl.textContent = subConfig.icon;
+
+              const subTitleEl = subEl.querySelector(".subtask-title");
+              subTitleEl.textContent = sub.title;
+              if (isSubDone) subTitleEl.classList.add("is-done");
+
+              treeEl.appendChild(subEl);
+            }
+          } else {
+            treeEl.remove();
+          }
+
+          const statusEl = taskEl.querySelector(".task-status");
+          statusEl.classList.add(config.textClass);
+          statusEl.textContent = config.label;
+
+          list.appendChild(taskEl);
+        }
+      }
+
+      renderTasks();
+    </script>
+  </body>
+</html>
