@@ -1,0 +1,9 @@
+[workspace]
+members = ["shared"]
+resolver = "2"
+
+[workspace.dependencies]
+serde = "1.0.228"
+specta = "1.0.5"
+specta-serde = "0.0.12"
+specta-typescript = "0.0.12"

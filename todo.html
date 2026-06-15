@@ -251,6 +251,10 @@
         font-size: 12.5px;
         color: #c9d1d9;
       }
+
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -273,7 +277,7 @@
                   <span class="todo-text">Продумать визуальную структуру виджета</span>
                 </label>
               </li>
-              <!-- <ul class="sub-tasks-list">
+              <ul class="sub-tasks-list hidden">
                 <li class="sub-task-item">
                   <label class="todo-label">
                     <input type="checkbox" checked />
@@ -288,28 +292,28 @@
                     <span class="todo-text">Выбрать цветовую схему для работы на прозрачном/полупрозрачном фоне.</span>
                   </label>
                 </li>
-              </ul> -->
+              </ul>
             </div>
 
             <div class="task-group">
               <li class="parent-task">
                 <label class="todo-label">
-                  <input type="checkbox" />
+                  <input type="checkbox" checked />
                   <span class="checkmark"></span>
                   <span class="todo-text">Спроектировать схемы данных</span>
                 </label>
               </li>
-              <ul class="sub-tasks-list">
+              <ul class="sub-tasks-list hidden">
                 <li class="sub-task-item">
                   <label class="todo-label">
-                    <input type="checkbox" />
+                    <input type="checkbox" checked />
                     <span class="checkmark"></span>
                     <span class="todo-text">Описать JSON-структуру сущности ToDo (ID, текст, статус).</span>
                   </label>
                 </li>
                 <li class="sub-task-item">
                   <label class="todo-label">
-                    <input type="checkbox" />
+                    <input type="checkbox" checked />
                     <span class="checkmark"></span>
                     <span class="todo-text"
                       >Спроектировать форматы WebSocket-событий (добавление, обновление, удаление).</span

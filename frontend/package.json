@@ -24,7 +24,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:all": "npm run format && npm run lint:css-vars && npm run lint:css && npm run check  && npm run lint && npm run test:run",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"format": "prettier --write * --log-level warn",
+		"format": "prettier --write . --log-level warn",
 		"lint": "prettier --check . && eslint .",
 		"lint:css": "stylelint '**/*.{css,svelte}",
 		"lint:css-vars": "node scripts/css-vars.js",
