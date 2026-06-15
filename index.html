@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYBER_TASK // TERMINAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.0/index.css" />
+    <style>
+      :root {
+        --bg-dark: #111814;
+        --bg-panel: rgba(26, 33, 28, 0.85);
+        --text-main: #f3f4f6;
+        --text-muted: #d1d5db;
+        --text-dim: #9ca3af;
+        --accent-green: #34d399;
+        --accent-green-dim: rgba(52, 211, 153, 0.15);
+        --accent-green-border: rgba(52, 211, 153, 0.4);
+        --amber: #fbbf24;
+        --amber-glow: rgba(251, 191, 36, 0.5);
+      }
+
+      body {
+        background-color: var(--bg-dark);
+        background-image:
+          linear-gradient(rgba(17, 24, 20, 0.92), rgba(17, 24, 20, 0.96)),
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 1px,
+            rgba(52, 211, 153, 0.03) 1px,
+            rgba(52, 211, 153, 0.03) 2px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 1px,
+            rgba(52, 211, 153, 0.02) 1px,
+            rgba(52, 211, 153, 0.02) 2px
+          );
+        background-size:
+          100% 100%,
+          40px 40px,
+          40px 40px;
+        color: var(--text-main);
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+      }
+
+      .font-mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .glow-text-subtle {
+        color: var(--accent-green);
+        text-shadow: 0 0 15px rgba(52, 211, 153, 0.5);
+      }
+
+      .panel {
+        background: var(--bg-panel);
+        border: 1px solid var(--accent-green-border);
+        backdrop-filter: blur(12px);
+        box-shadow:
+          0 10px 40px rgba(0, 0, 0, 0.4),
+          0 0 20px rgba(52, 211, 153, 0.05);
+      }
+
+      .task-item {
+        border-left: 2px solid transparent;
+        transition: all 0.3s ease;
+        background: rgba(15, 20, 15, 0.4);
+      }
+
+      /* Status Indicators */
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .status-pending {
+        background-color: var(--text-dim);
+      }
+
+      .status-done {
+        background-color: var(--accent-green);
+        box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+      }
+
+      .status-in-progress {
+        background-color: var(--amber);
+        box-shadow: 0 0 10px var(--amber-glow);
+        z-index: 2;
+      }
+
+      .status-in-progress::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid var(--amber);
+        animation: radar-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+      }
+
+      .status-in-progress::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 1px solid var(--amber);
+        animation: radar-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite 0.4s;
+      }
+
+      @keyframes radar-ping {
+        75%,
+        100% {
+          transform: translate(-50%, -50%) scale(3.5);
+          opacity: 0;
+        }
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 0.8;
+        }
+      }
+
+      .task-item.is-in-progress {
+        border-left: 2px solid var(--amber);
+        background: linear-gradient(90deg, rgba(251, 191, 36, 0.08) 0%, rgba(15, 20, 15, 0.4) 100%);
+        animation: border-glow 2.5s ease-in-out infinite;
+      }
+
+      @keyframes border-glow {
+        0%,
+        100% {
+          border-left-color: rgba(251, 191, 36, 0.4);
+          box-shadow: inset 4px 0 15px -4px rgba(251, 191, 36, 0.1);
+        }
+        50% {
+          border-left-color: rgba(251, 191, 36, 1);
+          box-shadow: inset 4px 0 20px -2px rgba(251, 191, 36, 0.25);
+        }
+      }
+
+      .shimmer-text {
+        background: linear-gradient(90deg, #d97706 0%, #fcd34d 40%, #ffffff 50%, #fcd34d 60%, #d97706 100%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 2.5s linear infinite;
+        display: inline-flex;
+        align-items: baseline;
+        font-weight: 700;
+      }
+
+      .shimmer-text::after {
+        content: "";
+        -webkit-text-fill-color: #fcd34d;
+        animation: dots 1.5s steps(4, end) infinite;
+        display: inline-block;
+        width: 1.2em;
+        text-align: left;
+        font-weight: 400;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 200% center;
+        }
+        100% {
+          background-position: -200% center;
+        }
+      }
+
+      @keyframes dots {
+        0% {
+          content: "";
+        }
+        25% {
+          content: ".";
+        }
+        50% {
+          content: "..";
+        }
+        75% {
+          content: "...";
+        }
+        100% {
+          content: "";
+        }
+      }
+
+      .subtask-tree {
+        position: relative;
+        padding-left: 16px;
+        margin-left: 14px;
+        border-left: 1px dashed #2a3530;
+      }
+
+      .subtask-tree::before {
+        content: "";
+        position: absolute;
+        left: -1px;
+        top: 8px;
+        width: 12px;
+        height: 1px;
+        background: #2a3530;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #2a3530;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-green-border);
+      }
+
+      .fade-in {
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="w-full max-w-2xl relative z-10">
+      <!-- Task List -->
+      <div class="panel rounded-sm overflow-hidden">
+        <div class="p-6">
+          <h1 class="text-3xl font-light tracking-wide mb-1 text-white flex justify-between items-start">
+            <div>Привет, <span class="glow-text-subtle font-medium">КиберХвостик</span></div>
+            <div class="font-mono text-[10px] text-[#9ca3af] uppercase items-start flex">
+              <span id="clock">00:00:00</span>
+            </div>
+          </h1>
+          <h2 class="text-xl font-mono text-[#d1d5db] mt-3 mb-6 flex items-center justify-between">
+            <span class="text-[#34d399] mr-3 text-2xl">> Текущие задачи</span>
+            <span class="font-mono text-[14px] text-[#9ca3af]" id="taskCount">0 объектов</span>
+          </h2>
+        </div>
+        <div id="taskList" class="divide-y divide-[#2a3530]/50">
+          <!-- Tasks will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const tasks = [
+        {
+          id: 1,
+          title: "Обновить протоколы безопасности",
+          description:
+            "Комплексная проверка сетевых интерфейсов. Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime id voluptatibus ex pariatur mollitia velit dolorem commodi aliquid, praesentium atque laboriosam, temporibus libero cum, a quaerat quo autem saepe cupiditate.",
+          status: "in-progress",
+          subtasks: [
+            { id: 101, title: "Проверить порт 8080", status: "done" },
+            { id: 102, title: "Проверить порт 443", status: "in-progress" },
+            { id: 103, title: "Обновить SSL сертификаты", status: "pending" },
+          ],
+        },
+        {
+          id: 2,
+          title: "Дефрагментация базы данных",
+          description: "",
+          status: "pending",
+          subtasks: [],
+        },
+        {
+          id: 3,
+          title: "Архивировать старые логи",
+          description: "Перенести данные за 2024 год в холодное хранилище",
+          status: "done",
+          subtasks: [
+            { id: 301, title: "Сжать архивы", status: "done" },
+            { id: 302, title: "Загрузить на внешний сервер", status: "done" },
+          ],
+        },
+        {
+          id: 4,
+          title: "Оптимизация нейросети",
+          description: "Снизить потребление ресурсов на 15% к концу недели",
+          status: "in-progress",
+          subtasks: [
+            { id: 401, title: "Анализ узких мест", status: "done" },
+            { id: 402, title: "Рефакторинг модуля предсказаний", status: "in-progress" },
+          ],
+        },
+      ];
+
+      function updateClock() {
+        const now = new Date();
+        document.getElementById("clock").innerText = now.toLocaleTimeString("ru-RU", { hour12: false });
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      const statusConfig = {
+        pending: { label: "Ожидание", class: "status-pending", textClass: "text-[#9ca3af]", icon: "[ ]" },
+        "in-progress": { label: "shimmer-text", class: "status-in-progress", textClass: "", icon: "[/]" },
+        done: { label: "Завершено", class: "status-done", textClass: "text-[#34d399]", icon: "[✓]" },
+      };
+
+      function renderTasks() {
+        const list = document.getElementById("taskList");
+        const count = document.getElementById("taskCount");
+        list.innerHTML = "";
+
+        count.innerText = `${tasks.length} ${getNoun(tasks.length, "задача", "задачи", "задач")}`;
+
+        tasks.forEach((task, index) => {
+          const config = statusConfig[task.status];
+          const isDone = task.status === "done";
+          const isInProgress = task.status === "in-progress";
+
+          const taskEl = document.createElement("div");
+          taskEl.className = `task-item p-6 flex flex-col md:flex-row md:items-start justify-between gap-4 fade-in ${isInProgress ? "is-in-progress" : ""} ${isDone ? "opacity-60" : ""}`;
+          taskEl.style.animationDelay = `${index * 0.1}s`;
+
+          const statusLabel = config.label === "shimmer-text" ? "В процессе" : config.label;
+          const statusClass =
+            config.label === "shimmer-text"
+              ? "shimmer-text"
+              : `font-mono text-[10px] uppercase tracking-wider font-bold ${config.textClass}`;
+
+          let subtasksHtml = "";
+          if (task.subtasks && task.subtasks.length > 0) {
+            subtasksHtml = `
+                        <div class="subtask-tree mt-4 space-y-3">
+                            ${task.subtasks
+                              .map((sub) => {
+                                const subConfig = statusConfig[sub.status];
+                                const isSubDone = sub.status === "done";
+                                return `
+                                    <div class="flex items-start gap-3 group">
+                                        <span class="font-mono text-xs ${subConfig.textClass} mt-0.5">${subConfig.icon}</span>
+                                        <span class="text-xs text-[#d1d5db] ${isSubDone ? "line-through text-[#6b7280]" : ""} transition-colors">
+                                            ${escapeHtml(sub.title)}
+                                        </span>
+                                    </div>
+                                `;
+                              })
+                              .join("")}
+                        </div>
+                    `;
+          }
+
+          taskEl.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="status-dot ${config.class} mt-1"></span>
+                            <h3 class="text-[16px] font-medium ${isDone ? "line-through text-[#9ca3af]" : "text-[#f3f4f6]"}">
+                                ${escapeHtml(task.title)}
+                            </h3>
+                        </div>
+                        ${task.description ? `<p class="text-sm text-[#9ca3af] ml-[34px] leading-relaxed mb-1">${escapeHtml(task.description)}</p>` : ""}
+                        
+                        ${subtasksHtml}
+
+                        <div class="ml-[34px] mt-4 ${statusClass}">
+                            ${statusLabel}
+                        </div>
+                    </div>
+                `;
+          list.appendChild(taskEl);
+        });
+      }
+
+      function getNoun(number, one, two, five) {
+        let n = Math.abs(number);
+        n %= 100;
+        if (n >= 5 && n <= 20) return five;
+        n %= 10;
+        if (n === 1) return one;
+        if (n >= 2 && n <= 4) return two;
+        return five;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      renderTasks();
+    </script>
+  </body>
+</html>
