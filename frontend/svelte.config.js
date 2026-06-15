@@ -4,8 +4,14 @@ import adapter from "@sveltejs/adapter-static";
 const config = {
 	kit: {
 		adapter: adapter(),
+		output: {
+			bundleStrategy: "inline",
+		},
 		alias: {
 			$cmp: "src/components",
+		},
+		router: {
+			type: "hash",
 		},
 	},
 	compilerOptions: { runes: true },
