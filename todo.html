@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OBS Detailed Roadmap Widget</title>
+    <style>
+      :root {
+        --bg-color: rgba(15, 15, 26, 0.92);
+        --border-color: #30363d;
+        --accent-color: #00f2fe;
+        --accent-glow: rgba(0, 242, 254, 0.3);
+        --text-main: #f0f6fc;
+        --text-muted: #8b949e;
+        --done-color: #4caf50;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: transparent;
+        color: var(--text-main);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 15px;
+        width: 500px;
+        height: 1000px;
+        overflow: hidden;
+      }
+
+      .widget-container {
+        width: 100%;
+        height: 100%;
+        background: var(--bg-color);
+        border: 2px solid var(--accent-color);
+        border-radius: 12px;
+        box-shadow: 0 0 20px var(--accent-glow);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(8px);
+      }
+
+      header {
+        margin-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 12px;
+        flex-shrink: 0;
+      }
+
+      h1 {
+        font-size: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--accent-color);
+        text-shadow: 0 0 8px var(--accent-glow);
+        margin-bottom: 4px;
+      }
+
+      .subtitle {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .content-scroll {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+
+      .content-scroll::-webkit-scrollbar {
+        width: 4px;
+      }
+      .content-scroll::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .content-scroll::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+      }
+
+      details {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        overflow: hidden;
+      }
+
+      summary {
+        padding: 12px;
+        font-size: 13px;
+        font-weight: bold;
+        color: var(--accent-color);
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: rgba(0, 242, 254, 0.02);
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary::before {
+        content: "▶";
+        display: inline-block;
+        margin-right: 10px;
+        font-size: 10px;
+        transition: transform 0.2s;
+      }
+
+      details[open] summary::before {
+        transform: rotate(90deg);
+      }
+
+      .todo-tree {
+        padding: 10px 14px;
+        list-style: none;
+      }
+
+      .task-group {
+        margin-bottom: 16px;
+      }
+
+      .task-group:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Общие стили для кастомных чекбоксов */
+      .todo-label {
+        display: flex;
+        align-items: flex-start;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      .todo-label input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        height: 0;
+        width: 0;
+      }
+
+      .checkmark {
+        border: 1px solid var(--text-muted);
+        flex-shrink: 0;
+        position: relative;
+        transition: all 0.2s;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .todo-label input:checked ~ .checkmark {
+        background-color: var(--done-color);
+        border-color: var(--done-color);
+      }
+
+      .checkmark::after {
+        content: "";
+        position: absolute;
+        display: none;
+        border: solid white;
+        transform: rotate(45deg);
+      }
+
+      .todo-label input:checked ~ .checkmark::after {
+        display: block;
+      }
+
+      .todo-text {
+        line-height: 1.4;
+        transition: color 0.2s;
+      }
+
+      .todo-label input:checked ~ .todo-text {
+        color: var(--text-muted);
+        text-decoration: line-through;
+      }
+
+      /* Специфика для ГЛАВНЫХ пунктов */
+      .parent-task {
+        display: flex;
+        margin-bottom: 8px;
+      }
+
+      .parent-task .checkmark {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        margin-right: 12px;
+        margin-top: 2px;
+      }
+
+      .parent-task .checkmark::after {
+        left: 5px;
+        top: 1px;
+        width: 4px;
+        height: 8px;
+        border-width: 0 2px 2px 0;
+      }
+
+      .parent-task .todo-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+      }
+
+      /* Специфика для ВЛОЖЕННЫХ пунктов */
+      .sub-tasks-list {
+        list-style: none;
+        padding-left: 28px;
+        border-left: 1px dashed rgba(255, 255, 255, 0.1);
+        margin-left: 7px;
+      }
+
+      .sub-task-item {
+        display: flex;
+        margin-bottom: 6px;
+      }
+
+      .sub-task-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .sub-task-item .checkmark {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        margin-right: 10px;
+        margin-top: 3px;
+      }
+
+      .sub-task-item .checkmark::after {
+        left: 3px;
+        top: 0px;
+        width: 3px;
+        height: 6px;
+        border-width: 0 1.5px 1.5px 0;
+      }
+
+      .sub-task-item .todo-text {
+        font-size: 12.5px;
+        color: #c9d1d9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="widget-container">
+      <header>
+        <h1>Todo Roadmap</h1>
+        <div class="subtitle">SvelteKit + Rust Axum + CLI</div>
+      </header>
+
+      <div class="content-scroll">
+        <!-- Этап 1 -->
+        <details open>
+          <summary>Этап 1: Дизайн и протокол</summary>
+          <ul class="todo-tree">
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" checked />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Продумать визуальную структуру виджета</span>
+                </label>
+              </li>
+              <!-- <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" checked />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Определить габариты контейнера под оверлей OBS.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" checked />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Выбрать цветовую схему для работы на прозрачном/полупрозрачном фоне.</span>
+                  </label>
+                </li>
+              </ul> -->
+            </div>
+
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Спроектировать схемы данных</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Описать JSON-структуру сущности ToDo (ID, текст, статус).</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Спроектировать форматы WebSocket-событий (добавление, обновление, удаление).</span
+                    >
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </ul>
+        </details>
+
+        <!-- Этап 2 -->
+        <details open>
+          <summary>Этап 2: Подготовка фронтенда</summary>
+          <ul class="todo-tree">
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Настроить окружение фронтенд-проекта</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Развернуть чистый проект через менеджер пакетов.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Интегрировать выбранный CSS-инструмент (фреймворк или препроцессор).</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Перевести сборщик в режим SPA (Single Page App)</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Подключить адаптер для генерации строго статических файлов.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Отключить SSR (серверный рендеринг) в глобальной конфигурации.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Настроить резервный роутинг на index.html (fallback).</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </ul>
+        </details>
+
+        <!-- Этап 3 -->
+        <details open>
+          <summary>Этап 3: Статический прототип</summary>
+          <ul class="todo-tree">
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Создать компоненты интерфейса</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Написать изолированный компонент для строки задачи (текст, галочка).</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Написать главный компонент-контейнер для вывода списка.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Добавить базовую анимацию для плавного появления/исчезновения строк.</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Настроить управление локальным состоянием</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Создать глобальное реактивное хранилище (стор) внутри фронтенда.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Наполнить стор статичным массивом задач для немедленной проверки верстки.</span
+                    >
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Проверить отображение в стрим-софте</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Скомпилировать проект в финальную статическую папку.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Закинуть сгенерированный index.html в OBS как браузерный источник.</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </ul>
+        </details>
+
+        <!-- Этап 4 -->
+        <details open>
+          <summary>Этап 4: Разработка бэкенда</summary>
+          <ul class="todo-tree">
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Развернуть архитектуру бэкенда</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Инициализировать Cargo воркспейс для изоляции сервера и CLI приложения.</span
+                    >
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Создать проект сервера, подключить сетевой фреймворк и асинхронный рантайм.</span
+                    >
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Реализовать постоянное хранение данных</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Написать модуль для чтения/записи состояния в локальный файл.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Обеспечить потокобезопасный доступ к данным в памяти сервера (Mutex/RwLock).</span
+                    >
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Подготовить REST API слой</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Написать обработчик (Handler) для отдачи полного списка задач (GET).</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Написать обработчики для добавления и изменения статуса задач (POST/PATCH).</span
+                    >
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Включить и настроить CORS-политику для входящих локальных запросов.</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </ul>
+        </details>
+
+        <!-- Этап 5 -->
+        <details open>
+          <summary>Этап 5: Интеграция WebSocket</summary>
+          <ul class="todo-tree">
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Организовать WebSocket-сервер</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Добавить эндпоинт для апгрейда HTTP-соединения до WebSocket.</span>
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Создать менеджер для сохранения каналов связи со всеми активными окнами виджета.</span
+                    >
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Реализовать бродкаст и связать с фронтендом</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Интегрировать отправку сообщений в сокеты при каждом успешном вызове REST API.</span
+                    >
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Во фронтенде написать функцию начальной загрузки данных через fetch при старте.</span
+                    >
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Реализовать постоянное WS-подключение на фронтенде с логикой переподключения (reconnect).</span
+                    >
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </ul>
+        </details>
+
+        <!-- Этап 6 -->
+        <details open>
+          <summary>Этап 6: CLI Утилита и Проверка</summary>
+          <ul class="todo-tree">
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Создать CLI приложение</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Добавить второй бинарник в воркспейс и подключить библиотеку парсинга ввода.</span
+                    >
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text">Описать дерево команд (widget todo add, widget todo done).</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="task-group">
+              <li class="parent-task">
+                <label class="todo-label">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="todo-text">Настроить отправку команд и сквозной тест</span>
+                </label>
+              </li>
+              <ul class="sub-tasks-list">
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Внедрить HTTP-клиент в CLI для отправки сформированных JSON-структур на сервер.</span
+                    >
+                  </label>
+                </li>
+                <li class="sub-task-item">
+                  <label class="todo-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span class="todo-text"
+                      >Провести финальный тест: команда из консоли -> изменение в БД -> сокет -> обновление в OBS.</span
+                    >
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </body>
+</html>
