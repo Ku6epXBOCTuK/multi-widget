@@ -7,16 +7,60 @@
 	}
 
 	let { stage }: Props = $props();
+
+	let isDone = $derived(stage.status === "done");
 </script>
 
-<div class="stage">
-	<div class="title_wrapper">
-		<div>{stage.title}</div>
-		<div>#{stage.id}</div>
-	</div>
-	<div class="tasks-list">
+<details open={!isDone}>
+	<summary>{stage.title}</summary>
+	<ul class="todo-tree">
 		{#each stage.tasks as task (task.id)}
 			<Task {task} />
 		{/each}
-	</div>
-</div>
+	</ul>
+</details>
+
+<style>
+	details {
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid var(--border-color);
+		border-radius: 8px;
+		margin-bottom: 12px;
+		overflow: hidden;
+	}
+
+	summary {
+		padding: 12px;
+		font-size: 13px;
+		font-weight: bold;
+		color: var(--accent-color);
+		cursor: pointer;
+		list-style: none;
+		display: flex;
+		align-items: center;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		background: rgba(0, 242, 254, 0.02);
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	summary::before {
+		content: "▶";
+		display: inline-block;
+		margin-right: 10px;
+		font-size: 10px;
+		transition: transform 0.2s;
+	}
+
+	details[open] summary::before {
+		transform: rotate(90deg);
+	}
+
+	.todo-tree {
+		padding: 10px 14px;
+		list-style: none;
+	}
+</style>

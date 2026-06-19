@@ -1,14 +1,11 @@
 :root {
-	--bg-dark: #111814;
-	--bg-panel: rgba(26, 33, 28, 0.85);
-	--text-main: #f3f4f6;
-	--text-muted: #d1d5db;
-	--text-dim: #9ca3af;
-	--accent-green: #34d399;
-	--accent-green-dim: rgba(52, 211, 153, 0.15);
-	--accent-green-border: rgba(52, 211, 153, 0.4);
-	--amber: #fbbf24;
-	--amber-glow: rgba(251, 191, 36, 0.5);
+	--bg-color: rgba(15, 15, 26, 0.92);
+	--border-color: #30363d;
+	--accent-color: #00f2fe;
+	--accent-glow: rgba(0, 242, 254, 0.3);
+	--text-main: #f0f6fc;
+	--text-muted: #8b949e;
+	--done-color: #4caf50;
 }
 
 *,
@@ -19,19 +16,49 @@
 
 body {
 	margin: 0;
-	padding: 2rem;
-	background: var(--bg-dark);
+	padding: 0;
+	background-color: transparent;
 	color: var(--text-main);
-	font-family: "Inter", sans-serif;
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 14px;
 	line-height: 1.6;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	width: 500px;
+	height: 950px;
+	overflow: hidden;
 }
 
 main {
-	max-width: 600px;
-	margin: 0 auto;
+	width: 100%;
+	height: 100%;
+	background: var(--bg-color);
+	border: 2px solid var(--accent-color);
+	border-radius: 12px;
+	box-shadow: 0 0 20px var(--accent-glow);
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	backdrop-filter: blur(8px);
 }
 
-.mono-font {
-	font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+.content-scroll {
+	flex-grow: 1;
+	overflow-y: auto;
+	padding-right: 5px;
+}
+
+.content-scroll::-webkit-scrollbar {
+	width: 4px;
+}
+
+.content-scroll::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.content-scroll::-webkit-scrollbar-thumb {
+	background: var(--border-color);
+	border-radius: 4px;
 }
