@@ -36,6 +36,22 @@ export const stages: Stage[] = [
 					},
 				],
 			},
+			{
+				id: 12,
+				parent: 1,
+				title: "Task 2",
+				description: "This is task 2",
+				status: "in-progress",
+				subtasks: [],
+			},
+			{
+				id: 13,
+				parent: 1,
+				title: "Task 3",
+				description: "This is task 3",
+				status: "pending",
+				subtasks: [],
+			},
 		],
 	},
 ] as const;
