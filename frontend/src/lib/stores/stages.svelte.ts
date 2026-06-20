@@ -264,14 +264,14 @@ stageStore.init([
 				parent: 4,
 				title: "Развернуть архитектуру бэкенда",
 				description: "",
-				status: "pending",
+				status: "done",
 				subtasks: [
 					{
 						id: 4001,
 						parent: 401,
 						title:
 							"Инициализировать Cargo воркспейс для изоляции сервера и CLI приложения.",
-						status: "pending",
+						status: "done",
 						description: "",
 					},
 					{
@@ -279,7 +279,7 @@ stageStore.init([
 						parent: 401,
 						title:
 							"Создать проект сервера, подключить сетевой фреймворк и асинхронный рантайм.",
-						status: "pending",
+						status: "done",
 						description: "",
 					},
 				],
@@ -295,7 +295,7 @@ stageStore.init([
 						id: 4003,
 						parent: 402,
 						title:
-							"Написать модуль для чтения/записи состояния в локальный файл.",
+							"Написать модуль для чтения/записи состояния в базу данных sqlite (sqlx миграции).",
 						status: "pending",
 						description: "",
 					},
@@ -346,33 +346,16 @@ stageStore.init([
 	},
 	{
 		id: 5,
-		title: "Этап 5: Интеграция WebSocket",
+		title: "Этап 5: Интеграция SSE",
 		status: "pending",
 		tasks: [
 			{
 				id: 501,
 				parent: 5,
-				title: "Организовать WebSocket-сервер",
+				title: "Организовать SSE-сервер",
 				description: "",
 				status: "pending",
-				subtasks: [
-					{
-						id: 5001,
-						parent: 501,
-						title:
-							"Добавить эндпоинт для апгрейда HTTP-соединения до WebSocket.",
-						status: "pending",
-						description: "",
-					},
-					{
-						id: 5002,
-						parent: 501,
-						title:
-							"Создать менеджер для сохранения каналов связи со всеми активными окнами виджета.",
-						status: "pending",
-						description: "",
-					},
-				],
+				subtasks: [],
 			},
 			{
 				id: 502,
@@ -385,7 +368,7 @@ stageStore.init([
 						id: 5003,
 						parent: 502,
 						title:
-							"Интегрировать отправку сообщений в сокеты при каждом успешном вызове REST API.",
+							"Интегрировать отправку сообщений в SSE при каждом успешном вызове REST API.",
 						status: "pending",
 						description: "",
 					},
@@ -401,7 +384,7 @@ stageStore.init([
 						id: 5005,
 						parent: 502,
 						title:
-							"Реализовать постоянное WS-подключение на фронтенде с логикой переподключения (reconnect).",
+							"Реализовать постоянное SSE-подключение на фронтенде с логикой переподключения и обработку Lagged.",
 						status: "pending",
 						description: "",
 					},
