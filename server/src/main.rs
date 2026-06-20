@@ -69,11 +69,11 @@ async fn sse_handler(
     let sse_stream = stream.filter_map(|res| async move {
         match res {
             Ok(msg) => Some(Ok(Event::default().data(msg))),
-            Err(tokio_stream::wrappers::errors::BroadcastStreamRecvError::Lagged(skipped)) => {
-                eprintln!("Клиент отстал и пропустил {} сообщений", skipped);
+            Err(tokio_stream::wrappers::errors::BroadcastStreamRecvError::Lagged(_)) => {
+                // TODO: Handle client lagged
                 Some(Ok(Event::default()
                     .event("error")
-                    .data("Вы пропустили часть сообщений из-за медленной сети")))
+                    .data("You to slow for my server")))
             }
         }
     });
@@ -87,7 +87,7 @@ async fn sse_handler(
 
 async fn send_message(State(state): State<Arc<AppState>>, body: String) -> &'static str {
     let _ = state.tx.send(body);
-    "Сообщение отправлено вещателю"
+    "Msg sended"
 }
 
 async fn full_activities_handler(State(state): State<Arc<AppState>>) -> Json<Vec<Activity>> {
@@ -144,5 +144,5 @@ async fn create_activity_handler(State(state): State<Arc<AppState>>, body: Strin
 }
 
 async fn health_handler() -> &'static str {
-    "OK"
+    "Ok"
 }

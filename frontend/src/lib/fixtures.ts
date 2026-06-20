@@ -531,7 +531,7 @@ export const activities: Activity[] = [
 		activity_type: "task",
 		title: "Организовать SSE-сервер",
 		description: "",
-		status: "pending",
+		status: "done",
 		url: null,
 		is_system: false,
 		created_at: "",
