@@ -16,6 +16,7 @@ use std::{
 };
 use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
+use tower_http::cors::{Any, CorsLayer};
 
 use crate::db::Db;
 
@@ -30,6 +31,8 @@ struct AppState {
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
+
+    let cors = CorsLayer::new().allow_origin(Any);
 
     let db = (Db::new().await).unwrap();
     let activities = db.get_all_activities().await.unwrap();
@@ -46,11 +49,13 @@ async fn main() {
         .route("/sse", get(sse_handler))
         .route("/send", post(send_message))
         .route("/health", get(health_handler))
-        .with_state(app_state);
+        .with_state(app_state)
+        .layer(cors);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
         .await
         .unwrap();
+
     axum::serve(listener, app).await.unwrap();
 }
 
