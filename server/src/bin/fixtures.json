@@ -282,7 +282,7 @@
     "activity_type": "task",
     "title": "Реализовать постоянное хранение данных",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 4003,
@@ -290,7 +290,7 @@
     "activity_type": "sub-task",
     "title": "Написать модуль для чтения/записи состояния в базу данных sqlite (sqlx миграции).",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 4004,
@@ -298,7 +298,7 @@
     "activity_type": "sub-task",
     "title": "Обеспечить потокобезопасный доступ к данным в памяти сервера (Mutex/RwLock).",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 403,
@@ -306,7 +306,7 @@
     "activity_type": "task",
     "title": "Подготовить REST API слой",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 4005,
@@ -314,7 +314,7 @@
     "activity_type": "sub-task",
     "title": "Написать обработчик (Handler) для отдачи полного списка задач (GET).",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 4006,
@@ -322,7 +322,7 @@
     "activity_type": "sub-task",
     "title": "Написать обработчики для добавления и изменения статуса задач (POST/PATCH).",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 4007,
@@ -330,7 +330,7 @@
     "activity_type": "sub-task",
     "title": "Включить и настроить CORS-политику для входящих локальных запросов.",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
 
   {
@@ -347,7 +347,7 @@
     "activity_type": "task",
     "title": "Организовать SSE-сервер",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 502,
@@ -363,7 +363,7 @@
     "activity_type": "sub-task",
     "title": "Интегрировать отправку сообщений в SSE при каждом успешном вызове REST API.",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 5004,
@@ -371,7 +371,7 @@
     "activity_type": "sub-task",
     "title": "Во фронтенде написать функцию начальной загрузки данных через fetch при старте.",
     "description": "",
-    "status": "pending"
+    "status": "done"
   },
   {
     "id": 5005,

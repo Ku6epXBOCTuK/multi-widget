@@ -27,5 +27,11 @@ export function getActivities() {
 
 export const activityStore = getActivities();
 
-import { activities as fixtureActivities } from "$lib/fixtures";
+// TODO: add neverthrow, error handling
+const fixtureActivities = await fetch("http://localhost:3000/activities").then(
+	(r) => {
+		return r.json();
+	},
+);
+
 activityStore.init(fixtureActivities);
