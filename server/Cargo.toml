@@ -5,7 +5,7 @@ edition = "2024"
 default-run = "server"
 
 [dependencies]
-axum = { workspace = true }
+axum = { workspace = true, features = ["macros"] }
 futures-util = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 sqlx = { workspace = true, features = ["chrono", "runtime-tokio", "sqlite"] }

@@ -2,13 +2,13 @@
 #![feature(sync_nonpoison)]
 
 use axum::{
-    Router,
+    Json, Router,
     extract::State,
     response::sse::{Event, Sse},
-    routing::{get, post},
+    routing::{get, patch, post},
 };
 use futures_util::stream::{Stream, StreamExt};
-use shared::Activity;
+use shared::{Activity, CreateActivityRequest, UpdateActivityRequest};
 use std::{
     convert::Infallible,
     sync::{Arc, nonpoison::Mutex},
@@ -23,6 +23,7 @@ mod db;
 
 struct AppState {
     activities: Arc<Mutex<Vec<Activity>>>,
+    db: Db,
     tx: broadcast::Sender<String>,
 }
 
@@ -31,16 +32,17 @@ async fn main() {
     dotenv::dotenv().ok();
 
     let db = (Db::new().await).unwrap();
-    let activities = db.get_activities().await.unwrap();
-    println!("Activities: {:?}", activities);
+    let activities = db.get_all_activities().await.unwrap();
 
     let activities = Arc::new(Mutex::new(activities));
 
     let (tx, _) = broadcast::channel::<String>(16);
-    let app_state = Arc::new(AppState { tx, activities });
+    let app_state = Arc::new(AppState { tx, activities, db });
 
     let app = Router::new()
-        // .route("/activities", get(full_activities_handler))
+        .route("/activities", get(full_activities_handler))
+        .route("/activities", patch(update_activity_handler))
+        .route("/activities", post(create_activity_handler))
         .route("/sse", get(sse_handler))
         .route("/send", post(send_message))
         .route("/health", get(health_handler))
@@ -81,6 +83,59 @@ async fn sse_handler(
 async fn send_message(State(state): State<Arc<AppState>>, body: String) -> &'static str {
     let _ = state.tx.send(body);
     "Сообщение отправлено вещателю"
+}
+
+async fn full_activities_handler(State(state): State<Arc<AppState>>) -> Json<Vec<Activity>> {
+    let activities = state.activities.lock();
+
+    Json(activities.clone())
+}
+
+async fn update_activity_handler(State(state): State<Arc<AppState>>, body: String) -> &'static str {
+    let body = serde_json::from_str::<UpdateActivityRequest>(&body);
+    if let Err(_) = body {
+        return "Error";
+    }
+    let body = body.unwrap();
+    let body_clone = body.clone();
+
+    {
+        let mut activities = state.activities.lock();
+        let body_id = body.id;
+        let try_find = activities
+            .iter_mut()
+            .find(|activity| activity.id == body_id);
+        if let Some(activity) = try_find {
+            activity.update_from(body_clone);
+        }
+    }
+
+    let db = &state.db;
+    match db.update_activity(body).await {
+        Ok(_) => "Ok",
+        Err(_) => "Error",
+    }
+}
+
+async fn create_activity_handler(State(state): State<Arc<AppState>>, body: String) -> &'static str {
+    let body = serde_json::from_str::<CreateActivityRequest>(&body);
+    if let Err(_) = body {
+        return "Error";
+    }
+    let body = body.unwrap();
+    let body_clone = body.clone();
+
+    {
+        let mut activities = state.activities.lock();
+        let new_activity = Activity::create_from(body_clone);
+        activities.push(new_activity);
+    }
+
+    let db = &state.db;
+    match db.create_activity(body).await {
+        Ok(_) => "Ok",
+        Err(_) => "Error",
+    }
 }
 
 async fn health_handler() -> &'static str {

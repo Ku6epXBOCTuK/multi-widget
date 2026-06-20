@@ -480,7 +480,7 @@ export const activities: Activity[] = [
 		title:
 			"Написать обработчик (Handler) для отдачи полного списка задач (GET).",
 		description: "",
-		status: "pending",
+		status: "done",
 		url: null,
 		is_system: false,
 		created_at: "",
@@ -493,7 +493,7 @@ export const activities: Activity[] = [
 		title:
 			"Написать обработчики для добавления и изменения статуса задач (POST/PATCH).",
 		description: "",
-		status: "pending",
+		status: "done",
 		url: null,
 		is_system: false,
 		created_at: "",

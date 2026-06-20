@@ -1,0 +1,29 @@
+info:
+  name: POST Activity
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: 127.0.0.1:3000/activities
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {  
+        "parent_id": 1000000,
+        "activity_type": "stage",
+        "title": "new stage",
+        "description": "",
+        "status": "done",
+        "url": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
