@@ -42,12 +42,12 @@ impl Db {
         Ok(activities)
     }
 
-    pub async fn get_activity_by_id(&self, id: ActivityId) -> Result<Activity, sqlx::Error> {
-        sqlx::query_as("SELECT * FROM activities WHERE id = ?")
-            .bind(id)
-            .fetch_one(&self.pool)
-            .await
-    }
+    // pub async fn get_activity_by_id(&self, id: ActivityId) -> Result<Activity, sqlx::Error> {
+    //     sqlx::query_as("SELECT * FROM activities WHERE id = ?")
+    //         .bind(id)
+    //         .fetch_one(&self.pool)
+    //         .await
+    // }
 
     pub async fn update_activity(
         &self,

@@ -1,0 +1,22 @@
+info:
+  name: GET Activity
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: 127.0.0.1:3000/activity?id=1000000
+  headers:
+    - name: Content-Type
+      value: application/json
+  params:
+    - name: id
+      value: "1000000"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

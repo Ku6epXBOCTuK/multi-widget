@@ -62,6 +62,11 @@ pub struct Activity {
 }
 
 #[derive(Debug, Type, Serialize, Deserialize, Clone)]
+pub struct GetActivityRequest {
+    pub id: ActivityId,
+}
+
+#[derive(Debug, Type, Serialize, Deserialize, Clone)]
 pub struct UpdateActivityRequest {
     pub id: ActivityId,
     pub parent_id: Option<ActivityId>,

@@ -556,7 +556,7 @@ export const activities: Activity[] = [
 		title:
 			"Интегрировать отправку сообщений в SSE при каждом успешном вызове REST API.",
 		description: "",
-		status: "pending",
+		status: "done",
 		url: null,
 		is_system: false,
 		created_at: "",

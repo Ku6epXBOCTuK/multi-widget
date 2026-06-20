@@ -3,12 +3,12 @@
 
 use axum::{
     Json, Router,
-    extract::State,
+    extract::{Query, State},
     response::sse::{Event, Sse},
     routing::{get, patch, post},
 };
 use futures_util::stream::{Stream, StreamExt};
-use shared::{Activity, CreateActivityRequest, UpdateActivityRequest};
+use shared::{Activity, CreateActivityRequest, GetActivityRequest, UpdateActivityRequest};
 use std::{
     convert::Infallible,
     sync::{Arc, nonpoison::Mutex},
@@ -18,14 +18,15 @@ use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
 use tower_http::cors::{Any, CorsLayer};
 
-use crate::db::Db;
+use crate::{db::Db, types::SseEvent};
 
 mod db;
+mod types;
 
 struct AppState {
     activities: Arc<Mutex<Vec<Activity>>>,
     db: Db,
-    tx: broadcast::Sender<String>,
+    tx: broadcast::Sender<SseEvent>,
 }
 
 #[tokio::main]
@@ -39,15 +40,15 @@ async fn main() {
 
     let activities = Arc::new(Mutex::new(activities));
 
-    let (tx, _) = broadcast::channel::<String>(16);
+    let (tx, _) = broadcast::channel::<SseEvent>(16);
     let app_state = Arc::new(AppState { tx, activities, db });
 
     let app = Router::new()
         .route("/activities", get(full_activities_handler))
-        .route("/activities", patch(update_activity_handler))
-        .route("/activities", post(create_activity_handler))
+        .route("/activity", get(single_activity_handler))
+        .route("/activity", patch(update_activity_handler))
+        .route("/activity", post(create_activity_handler))
         .route("/sse", get(sse_handler))
-        .route("/send", post(send_message))
         .route("/health", get(health_handler))
         .with_state(app_state)
         .layer(cors);
@@ -68,7 +69,9 @@ async fn sse_handler(
 
     let sse_stream = stream.filter_map(|res| async move {
         match res {
-            Ok(msg) => Some(Ok(Event::default().data(msg))),
+            Ok(msg) => Some(Ok(
+                Event::default().data(serde_json::to_string(&msg).unwrap_or_default())
+            )),
             Err(tokio_stream::wrappers::errors::BroadcastStreamRecvError::Lagged(_)) => {
                 // TODO: Handle client lagged
                 Some(Ok(Event::default()
@@ -85,15 +88,24 @@ async fn sse_handler(
     )
 }
 
-async fn send_message(State(state): State<Arc<AppState>>, body: String) -> &'static str {
-    let _ = state.tx.send(body);
-    "Msg sended"
-}
-
 async fn full_activities_handler(State(state): State<Arc<AppState>>) -> Json<Vec<Activity>> {
     let activities = state.activities.lock();
 
     Json(activities.clone())
+}
+
+async fn single_activity_handler(
+    State(state): State<Arc<AppState>>,
+    query: Query<GetActivityRequest>,
+) -> Json<Option<Activity>> {
+    let activities = state.activities.lock();
+
+    let activity = activities
+        .iter()
+        .find(|activity| activity.id == query.id)
+        .cloned();
+
+    Json(activity)
 }
 
 async fn update_activity_handler(State(state): State<Arc<AppState>>, body: String) -> &'static str {
@@ -117,7 +129,10 @@ async fn update_activity_handler(State(state): State<Arc<AppState>>, body: Strin
 
     let db = &state.db;
     match db.update_activity(body).await {
-        Ok(_) => "Ok",
+        Ok(activity) => {
+            let _ = state.tx.send(SseEvent::UpdateActivity(activity));
+            "Ok"
+        }
         Err(_) => "Error",
     }
 }
@@ -138,7 +153,10 @@ async fn create_activity_handler(State(state): State<Arc<AppState>>, body: Strin
 
     let db = &state.db;
     match db.create_activity(body).await {
-        Ok(_) => "Ok",
+        Ok(activity) => {
+            let _ = state.tx.send(SseEvent::CreateActivity(activity));
+            "Ok"
+        }
         Err(_) => "Error",
     }
 }
