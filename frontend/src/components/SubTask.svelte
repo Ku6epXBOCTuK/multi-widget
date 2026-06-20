@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { SubTask } from "$lib/generated-bindings";
+	import type { Activity } from "$lib/generated-bindings";
 
 	interface Props {
-		subtask: SubTask;
+		subtask: Activity;
 	}
 
 	let { subtask }: Props = $props();

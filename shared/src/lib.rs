@@ -1,50 +1,69 @@
 #![allow(dead_code)]
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use specta::Type;
+use sqlx::{
+    Type as SqlxType,
+    prelude::FromRow,
+    types::chrono::{DateTime, Utc},
+};
+use std::str::FromStr;
+use strum::{Display, EnumString};
 
-#[derive(Debug, Type, Serialize)]
+#[derive(Debug, Type, Serialize, Deserialize, Display, SqlxType, EnumString)]
 #[serde(rename_all = "kebab-case")]
-pub enum TaskStatus {
+#[sqlx(type_name = "TEXT", rename_all = "kebab-case")]
+pub enum ActivityStatus {
     Pending,
     InProgress,
     Done,
 }
 
-#[derive(Debug, Type)]
-pub struct SubTask {
-    id: u32,
-    parent: u32,
-    title: String,
-    status: TaskStatus,
-    description: String,
+impl From<String> for ActivityStatus {
+    fn from(s: String) -> Self {
+        Self::from_str(&s).unwrap_or(ActivityStatus::Pending)
+    }
 }
 
-#[derive(Debug, Type)]
-pub struct Task {
-    id: u32,
-    parent: u32,
-    title: String,
-    status: TaskStatus,
-    description: String,
-    subtasks: Vec<SubTask>,
+#[derive(Debug, Type, Serialize, Deserialize, Display, SqlxType, EnumString)]
+#[serde(rename_all = "kebab-case")]
+#[sqlx(type_name = "TEXT", rename_all = "kebab-case")]
+pub enum ActivityType {
+    Project,
+    Stage,
+    Task,
+    SubTask,
 }
 
-#[derive(Debug, Type)]
-pub struct Stage {
-    id: u32,
-    title: String,
-    status: TaskStatus,
-    tasks: Vec<Task>,
+impl From<String> for ActivityType {
+    fn from(s: String) -> Self {
+        Self::from_str(&s).unwrap_or(ActivityType::Task)
+    }
 }
 
-#[derive(Debug, Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, SqlxType, Type, Serialize, Deserialize,
+)]
+#[sqlx(transparent)]
+pub struct ActivityId(i32);
+
+#[derive(Debug, Type, Serialize, Deserialize, FromRow)]
+pub struct Activity {
+    pub id: ActivityId,
+    pub parent_id: Option<ActivityId>,
+    pub activity_type: ActivityType,
+    pub title: String,
+    pub description: Option<String>,
+    pub status: ActivityStatus,
+    pub url: Option<String>,
+    pub is_system: bool,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Type, Serialize, Deserialize)]
 pub enum WsEvent {
-    AddTask(Task),
-    UpdateTask(Task),
-    AddSubTask(SubTask),
-    UpdateSubTask(SubTask),
-    AddStage(Stage),
-    UpdateStage(Stage),
-    Delete(u32),
+    AddActivity(Activity),
+    UpdateActivity(Activity),
+    Delete(ActivityId),
 }

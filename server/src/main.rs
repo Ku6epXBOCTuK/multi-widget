@@ -1,3 +1,6 @@
+#![feature(nonpoison_mutex)]
+#![feature(sync_nonpoison)]
+
 use axum::{
     Router,
     extract::State,
@@ -5,20 +8,39 @@ use axum::{
     routing::{get, post},
 };
 use futures_util::stream::{Stream, StreamExt};
-use std::{convert::Infallible, sync::Arc, time::Duration};
+use shared::Activity;
+use std::{
+    convert::Infallible,
+    sync::{Arc, nonpoison::Mutex},
+    time::Duration,
+};
 use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
 
+use crate::db::Db;
+
+mod db;
+
 struct AppState {
+    activities: Arc<Mutex<Vec<Activity>>>,
     tx: broadcast::Sender<String>,
 }
 
 #[tokio::main]
 async fn main() {
+    dotenv::dotenv().ok();
+
+    let db = (Db::new().await).unwrap();
+    let activities = db.get_activities().await.unwrap();
+    println!("Activities: {:?}", activities);
+
+    let activities = Arc::new(Mutex::new(activities));
+
     let (tx, _) = broadcast::channel::<String>(16);
-    let app_state = Arc::new(AppState { tx });
+    let app_state = Arc::new(AppState { tx, activities });
 
     let app = Router::new()
+        // .route("/activities", get(full_activities_handler))
         .route("/sse", get(sse_handler))
         .route("/send", post(send_message))
         .route("/health", get(health_handler))

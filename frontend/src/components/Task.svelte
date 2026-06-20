@@ -1,15 +1,17 @@
 <script lang="ts">
-	import type { Task } from "$lib/generated-bindings";
+	import type { Activity } from "$lib/generated-bindings";
 	import SubTask from "./SubTask.svelte";
 
 	interface Props {
-		task: Task;
+		task: Activity;
+		activities: Activity[];
 	}
 
-	let { task }: Props = $props();
+	let { task, activities }: Props = $props();
 
 	let isDone = $derived(task.status === "done");
-	let hasSubtasks = $derived(task.subtasks.length > 0);
+	let subtasks = $derived(activities.filter((a) => a.parent_id === task.id));
+	let hasSubtasks = $derived(subtasks.length > 0);
 </script>
 
 <div class="task-group">
@@ -22,7 +24,7 @@
 	</li>
 	{#if hasSubtasks}
 		<ul class="sub-tasks-list">
-			{#each task.subtasks as subtask (subtask.id)}
+			{#each subtasks as subtask (subtask.id)}
 				<SubTask {subtask} />
 			{/each}
 		</ul>

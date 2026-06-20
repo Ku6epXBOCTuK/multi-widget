@@ -1,21 +1,23 @@
 <script lang="ts">
-	import type { Stage } from "$lib/generated-bindings";
+	import type { Activity } from "$lib/generated-bindings";
 	import Task from "./Task.svelte";
 
 	interface Props {
-		stage: Stage;
+		stage: Activity;
+		activities: Activity[];
 	}
 
-	let { stage }: Props = $props();
+	let { stage, activities }: Props = $props();
 
 	let isDone = $derived(stage.status === "done");
+	let tasks = $derived(activities.filter((a) => a.parent_id === stage.id));
 </script>
 
 <details open={!isDone}>
 	<summary>{stage.title}</summary>
 	<ul class="todo-tree">
-		{#each stage.tasks as task (task.id)}
-			<Task {task} />
+		{#each tasks as task (task.id)}
+			<Task {task} {activities} />
 		{/each}
 	</ul>
 </details>

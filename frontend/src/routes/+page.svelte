@@ -1,17 +1,27 @@
 <script lang="ts">
 	import Stage from "$cmp/Stage.svelte";
-	import { stageStore } from "$lib/stores/stages.svelte";
+	import { activityStore } from "$lib/states/projects.svelte";
+
+	const activities = activityStore.all;
+	const currentProject = $derived(
+		activities.find((a) => a.activity_type === "project"),
+	);
+	const stages = $derived(
+		currentProject
+			? activities.filter((a) => a.parent_id === currentProject.id)
+			: [],
+	);
 </script>
 
 <div class="widget-container">
 	<header>
-		<h1>Todo Roadmap</h1>
-		<div class="subtitle">SvelteKit + Rust Axum + CLI</div>
+		<h1>{currentProject?.title}</h1>
+		<div class="subtitle">{currentProject?.description}</div>
 	</header>
 
 	<div class="content-scroll">
-		{#each stageStore.all as stage (stage.id)}
-			<Stage {stage} />
+		{#each stages as stage (stage.id)}
+			<Stage {stage} {activities} />
 		{/each}
 	</div>
 </div>

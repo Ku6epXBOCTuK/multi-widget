@@ -2,10 +2,20 @@
 name = "server"
 version = "0.1.0"
 edition = "2024"
+default-run = "server"
 
 [dependencies]
 axum = { workspace = true }
 futures-util = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+sqlx = { workspace = true, features = ["chrono", "runtime-tokio", "sqlite"] }
 tokio = { workspace = true, features = ["rt-multi-thread"] }
 tokio-stream = { workspace = true, features = ["sync"] }
+shared = { workspace = true }
+serde_json = { workspace = true }
+dotenv = { workspace = true }
+chrono = { workspace = true }
+
+[[bin]]
+name = "fixtures"
+path = "src/bin/fixtures.rs"
