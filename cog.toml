@@ -1,0 +1,1 @@
+scopes = ["frontend", "server", "shared", "cli", "game", "ci", "repo"]
