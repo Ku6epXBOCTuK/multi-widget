@@ -1,0 +1,28 @@
+{
+	"name": "multi-widget",
+	"version": "0.1.0",
+	"description": "Multi widget monorepository",
+	"keywords": [
+		"obs",
+		"widget"
+	],
+	"homepage": "https://github.com/Ku6epXBOCTuK/multi-widget#readme",
+	"bugs": {
+		"url": "https://github.com/Ku6epXBOCTuK/multi-widget/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Ku6epXBOCTuK/multi-widget.git"
+	},
+	"license": "MIT OR Apache-2.0",
+	"author": "Ku6epXBOCTuK",
+	"type": "module",
+	"scripts": {
+		"format:issues": "prettier ./.issues/*.md --write",
+		"lint:issues:md": "markdownlint-cli2 ./.issues/*.md"
+	},
+	"devDependencies": {
+		"markdownlint-cli2": "^0.22.1",
+		"prettier": "^3.8.4"
+	}
+}

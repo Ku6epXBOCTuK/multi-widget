@@ -1,0 +1,59 @@
+{
+	"$schema": "https://frontmatter.codes/frontmatter.schema.json",
+	"frontMatter.taxonomy.contentTypes": [
+		{
+			"name": "Issues",
+			"pageBundle": false,
+			"previewPath": null,
+			"filePrefix": "{{filePrefix.index|<zeros:3>}}-",
+			"fields": [
+				{
+					"title": "Title",
+					"name": "title",
+					"type": "string",
+					"required": true
+				},
+				{
+					"title": "status",
+					"name": "status",
+					"type": "choice",
+					"choices": ["open", "in-progress", "closed"],
+					"default": "open",
+					"required": true
+				},
+				{
+					"title": "Description",
+					"name": "description",
+					"type": "string"
+				},
+				{
+					"title": "Created date",
+					"name": "date",
+					"type": "datetime",
+					"default": "{{now}}",
+					"isModifiedDate": false,
+					"isPublishDate": true
+				},
+				{
+					"title": "Categories",
+					"name": "categories",
+					"type": "categories"
+				},
+				{
+					"title": "fmContentType",
+					"name": "fmContentType",
+					"type": "choice",
+					"choices": ["Issues"]
+				}
+			]
+		}
+	],
+	"frontMatter.content.pageFolders": [
+		{
+			"title": "Issues",
+			"path": "[[workspace]]/.issues"
+		}
+	],
+	"frontMatter.assets.folder": ".issues/attachments",
+	"frontMatter.taxonomy.dateFormat": "yyyy-MM-dd'T'HH:mm:ss'Z'"
+}
