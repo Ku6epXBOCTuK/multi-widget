@@ -1,5 +1,14 @@
 {
 	"taxonomy": {
-		"categories": ["ci", "cli", "frontend", "game", "repo", "server", "shared"]
+		"categories": [
+			"ci",
+			"cli",
+			"frontend",
+			"game",
+			"repo",
+			"server",
+			"shared",
+			"docs"
+		]
 	}
 }
