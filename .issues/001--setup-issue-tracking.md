@@ -1,6 +1,6 @@
 ---
 title: Настроить локальный трекер задач в монорепозитории
-status: open
+status: closed
 date: 2026-06-22T01:31:38Z
 categories:
   - repo
@@ -28,25 +28,25 @@ fmContentType: Issues
 
 #### 🦀 2. Локальный тулинг (Бэкенд-часть)
 
-- [ ] Создать служебный крейт `xtask` в корне Cargo-воркспейса.
-- [ ] Добавить алиас `xtask = "run --package xtask --"` в файл
+- [x] Создать служебный крейт `xtask` в корне Cargo-воркспейса.
+- [x] Добавить алиас `xtask = "run --package xtask --"` в файл
       `.cargo/config.toml`.
-- [ ] Написать в `xtask` команду `lint-issues`:
+- [x] Написать в `xtask` команду `lint-issues`:
   - Парсинг и строгая валидация YAML-полей через `serde_yaml` (проверка enum
     статусов и тегов).
-  - Вызов `npx markdownlint-cli2` через `std::process::Command` для проверки
+  - Вызов `npm run lint:issues:md` через `std::process::Command` для проверки
     тела текста.
 
 #### 🚀 3. Интеграция в CI
 
-- [ ] Добавить в `.github/workflows/ci.yml` шаг запуска локального линтера:
+- [x] Добавить в `.github/workflows/ci.yml` шаг запуска локального линтера:
 
   ```yaml
   - name: Lint Issues via xtask
     run: cargo xtask lint-issues
   ```
 
-- [ ] Проверить, что при ошибке в оформлении задачи или опечатке в статусе
+- [x] Проверить, что при ошибке в оформлении задачи или опечатке в статусе
       сборка в GitHub Actions падает.
 
 ### Полезные материалы и скриншоты
