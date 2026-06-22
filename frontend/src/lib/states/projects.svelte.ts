@@ -1,4 +1,5 @@
 import type { Activity } from "$lib/generated-bindings";
+import { getAllActivities } from "$lib/utils";
 
 let activities = $state<Activity[]>([]);
 
@@ -27,11 +28,6 @@ export function getActivities() {
 
 export const activityStore = getActivities();
 
-// TODO: add neverthrow, error handling
-const fixtureActivities = await fetch("http://localhost:3000/activities").then(
-	(r) => {
-		return r.json();
-	},
-);
-
-activityStore.init(fixtureActivities);
+await getAllActivities().andTee((fixtureActivities) => {
+	activityStore.init(fixtureActivities);
+});

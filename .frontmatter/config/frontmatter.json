@@ -55,5 +55,12 @@
 		}
 	],
 	"frontMatter.assets.folder": ".issues/attachments",
-	"frontMatter.taxonomy.dateFormat": "yyyy-MM-dd'T'HH:mm:ss'Z'"
+	"frontMatter.taxonomy.dateFormat": "yyyy-MM-dd'T'HH:mm:ss'Z'",
+	"frontMatter.content.filters": [
+		"categories",
+		{
+			"title": "Issue status",
+			"name": "status"
+		}
+	]
 }

@@ -1,6 +1,6 @@
 ---
 title: "Вынести URL API в переменную окружения, заменить хардкод"
-status: open
+status: closed
 date: 2026-06-22T15:00:13.178Z
 categories:
   - frontend

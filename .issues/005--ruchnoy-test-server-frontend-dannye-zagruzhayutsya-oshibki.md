@@ -1,6 +1,6 @@
 ---
 title: "Ручной тест: сервер + фронтенд, данные загружаются, ошибки"
-status: open
+status: closed
 date: 2026-06-22T15:00:13.179Z
 categories:
   - frontend
