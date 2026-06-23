@@ -24,7 +24,7 @@ export class NetworkStream {
 		this.#eventSource = new EventSource(this.#url);
 
 		this.#eventSource.onopen = () => {
-			console.log("SSE connected...");
+			logger.log("SSE connected...");
 		};
 
 		this.#eventSource.onmessage = (event) => {
@@ -33,12 +33,12 @@ export class NetworkStream {
 					this.#processEvent(parsed);
 				})
 				.orTee(() => {
-					console.error("Error: received event is not a valid JSON");
+					logger.error("Error: received event is not a valid JSON");
 				});
 		};
 
 		this.#eventSource.onerror = (_) => {
-			console.error("SSE or network error...");
+			logger.error("SSE or network error...");
 			// TODO: need investigate reconnection flow???
 		};
 	}
@@ -46,12 +46,12 @@ export class NetworkStream {
 	disconnect() {
 		if (this.#eventSource) {
 			this.#eventSource.close();
-			console.log("SSE connection closed");
+			logger.log("SSE connection closed");
 		}
 	}
 
 	#processEvent(event: StreamEvent) {
-		console.log("Received event:", event);
+		logger.log("Received event:", event);
 		match(event)
 			.with({ variant: "createActivity" }, (e) => {
 				this.#processActivity.createActivity(e.payload);

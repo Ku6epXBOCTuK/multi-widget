@@ -1,6 +1,6 @@
 ---
 title: Add logger service
-status: open
+status: closed
 description: Add logger service
 date: 2026-06-23T04:42:55Z
 categories:
