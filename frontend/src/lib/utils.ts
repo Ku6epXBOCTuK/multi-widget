@@ -1,6 +1,5 @@
-import { PUBLIC_BASE_URL } from "$env/static/public";
-import { errAsync, ResultAsync } from "neverthrow";
-import type { Activity } from "./generated-bindings";
+import { err, ok, type Result } from "neverthrow";
+import type { AppError } from "./error";
 
 export function getNoun(
 	number: number,
@@ -21,34 +20,10 @@ export function getNoun(
 	return five;
 }
 
-type FetchError =
-	| { type: "NETWORK_ERROR"; error: unknown }
-	| { type: "HTTP_ERROR"; status: number; statusText: string }
-	| { type: "PARSE_ERROR"; error: unknown };
-
-export function appFetch<T>(
-	url: string,
-	options?: RequestInit,
-): ResultAsync<T, FetchError> {
-	return ResultAsync.fromPromise(
-		fetch(url, options),
-		(error): FetchError => ({ type: "NETWORK_ERROR", error }),
-	).andThen((response) => {
-		if (!response.ok) {
-			return errAsync<T, FetchError>({
-				type: "HTTP_ERROR",
-				status: response.status,
-				statusText: response.statusText,
-			});
-		}
-
-		return ResultAsync.fromPromise(
-			response.json() as Promise<T>,
-			(error): FetchError => ({ type: "PARSE_ERROR", error }),
-		);
-	});
-}
-
-export function getAllActivities(): ResultAsync<Activity[], FetchError> {
-	return appFetch<Activity[]>(`${PUBLIC_BASE_URL}/activities`);
+export function parseJson<T>(data: string): Result<T, AppError> {
+	try {
+		return ok(JSON.parse(data));
+	} catch (e) {
+		return err({ type: "PARSE_ERROR", error: e });
+	}
 }

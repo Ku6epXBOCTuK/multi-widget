@@ -1,0 +1,18 @@
+info:
+  name: DELETE Activity
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: 127.0.0.1:3000/activity?id=1000000
+  params:
+    - name: id
+      value: "1000000"
+      type: query
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

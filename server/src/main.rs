@@ -8,7 +8,9 @@ use axum::{
     routing::{get, patch, post},
 };
 use futures_util::stream::{Stream, StreamExt};
-use shared::{Activity, CreateActivityRequest, GetActivityRequest, UpdateActivityRequest};
+use shared::{
+    Activity, CreateActivityRequest, GetActivityRequest, StreamEvent, UpdateActivityRequest,
+};
 use std::{
     convert::Infallible,
     sync::{Arc, nonpoison::Mutex},
@@ -18,7 +20,7 @@ use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
 use tower_http::cors::{Any, CorsLayer};
 
-use crate::{db::Db, types::SseEvent};
+use crate::db::Db;
 
 mod db;
 mod types;
@@ -26,7 +28,7 @@ mod types;
 struct AppState {
     activities: Arc<Mutex<Vec<Activity>>>,
     db: Db,
-    tx: broadcast::Sender<SseEvent>,
+    tx: broadcast::Sender<StreamEvent>,
 }
 
 #[tokio::main]
@@ -40,7 +42,7 @@ async fn main() {
 
     let activities = Arc::new(Mutex::new(activities));
 
-    let (tx, _) = broadcast::channel::<SseEvent>(16);
+    let (tx, _) = broadcast::channel::<StreamEvent>(16);
     let app_state = Arc::new(AppState { tx, activities, db });
 
     let app = Router::new()
@@ -130,7 +132,7 @@ async fn update_activity_handler(State(state): State<Arc<AppState>>, body: Strin
     let db = &state.db;
     match db.update_activity(body).await {
         Ok(activity) => {
-            let _ = state.tx.send(SseEvent::UpdateActivity(activity));
+            let _ = state.tx.send(StreamEvent::UpdateActivity(activity));
             "Ok"
         }
         Err(_) => "Error",
@@ -154,7 +156,7 @@ async fn create_activity_handler(State(state): State<Arc<AppState>>, body: Strin
     let db = &state.db;
     match db.create_activity(body).await {
         Ok(activity) => {
-            let _ = state.tx.send(SseEvent::CreateActivity(activity));
+            let _ = state.tx.send(StreamEvent::CreateActivity(activity));
             "Ok"
         }
         Err(_) => "Error",

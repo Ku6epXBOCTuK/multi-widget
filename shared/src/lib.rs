@@ -113,9 +113,10 @@ impl Activity {
     }
 }
 
-#[derive(Debug, Type, Serialize, Deserialize)]
-pub enum WsEvent {
-    AddActivity(Activity),
+#[derive(Debug, Type, Serialize, Deserialize, Clone)]
+#[serde(tag = "variant", content = "payload", rename_all = "camelCase")]
+pub enum StreamEvent {
+    CreateActivity(Activity),
     UpdateActivity(Activity),
-    Delete(ActivityId),
+    DeleteActivity(ActivityId),
 }

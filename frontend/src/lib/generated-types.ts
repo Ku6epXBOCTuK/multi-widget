@@ -18,7 +18,7 @@ export type ActivityStatus = "pending" | "in-progress" | "done";
 
 export type ActivityType = "project" | "stage" | "task" | "sub-task";
 
-export type WsEvent =
-	| ({ AddActivity: Activity } & { Delete?: never; UpdateActivity?: never })
-	| ({ UpdateActivity: Activity } & { AddActivity?: never; Delete?: never })
-	| ({ Delete: ActivityId } & { AddActivity?: never; UpdateActivity?: never });
+export type StreamEvent =
+	| { variant: "createActivity"; payload: Activity }
+	| { variant: "updateActivity"; payload: Activity }
+	| { variant: "deleteActivity"; payload: ActivityId };

@@ -1,5 +1,5 @@
-import type { Activity } from "$lib/generated-bindings";
-import { getAllActivities } from "$lib/utils";
+import type { Activity } from "$lib/generated-types";
+import { getAllActivities } from "$lib/network";
 
 let activities = $state<Activity[]>([]);
 

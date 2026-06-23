@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Activity } from "$lib/generated-bindings";
+	import type { Activity } from "$lib/generated-types";
 	import Task from "./Task.svelte";
 
 	interface Props {

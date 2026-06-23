@@ -1,6 +1,6 @@
 ---
 title: "Создать SSE utility модуль с `EventSource` и reconnect"
-status: open
+status: closed
 date: 2026-06-22T15:00:13.180Z
 categories:
   - frontend
