@@ -1,5 +1,5 @@
 ---
-title: "Ручной тест: `curl -X DELETE` → виджет убирает строку"
+title: "Ручной тест: `bruno DELETE` → виджет убирает строку"
 status: open
 date: 2026-06-22T15:00:13.186Z
 categories:
@@ -10,4 +10,6 @@ fmContentType: Issues
 
 ## Описание задачи
 
-Ручной тест: `curl -X DELETE` → виджет убирает строку
+Ручной тест: `bruno extension DELETE` → виджет убирает строку
+
+## Blocked by [012-delete](012--dobavit-delete-route-handler-na-servere.md)

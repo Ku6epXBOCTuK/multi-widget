@@ -11,3 +11,5 @@ fmContentType: Issues
 ## Описание задачи
 
 Broadcast `DeleteActivity` через SSE
+
+## Blocked by [012-delete](012--dobavit-delete-route-handler-na-servere.md)
