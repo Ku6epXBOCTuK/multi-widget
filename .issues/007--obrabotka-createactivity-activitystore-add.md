@@ -1,6 +1,6 @@
 ---
-title: "Обработка `CreateActivity` → `activityStore.add()`"
-status: open
+title: "Обработка `CreateActivity` → `activityState.create()`"
+status: closed
 date: 2026-06-22T15:00:13.181Z
 categories:
   - frontend
@@ -10,4 +10,4 @@ fmContentType: Issues
 
 ## Описание задачи
 
-Обработка `CreateActivity` → `activityStore.add()`
+Обработка `CreateActivity` → `activityState.create()`

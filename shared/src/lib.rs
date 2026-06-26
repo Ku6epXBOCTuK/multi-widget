@@ -45,7 +45,7 @@ impl From<String> for ActivityType {
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, SqlxType, Type, Serialize, Deserialize,
 )]
 #[sqlx(transparent)]
-pub struct ActivityId(i32);
+pub struct ActivityId(pub i32);
 
 #[derive(Debug, Type, Serialize, Deserialize, FromRow, Clone)]
 pub struct Activity {
@@ -88,9 +88,9 @@ pub struct CreateActivityRequest {
 }
 
 impl Activity {
-    pub fn create_from(create: CreateActivityRequest) -> Self {
+    pub fn create_from(create: CreateActivityRequest, id: ActivityId) -> Self {
         Self {
-            id: ActivityId(12345),
+            id,
             parent_id: create.parent_id,
             activity_type: create.activity_type,
             title: create.title,

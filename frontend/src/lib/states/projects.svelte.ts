@@ -1,33 +1,37 @@
-import type { Activity } from "$lib/generated-types";
+import type { Activity, ActivityId } from "$lib/generated-types";
 import { getAllActivities } from "$lib/network";
+import type { ProcessActivity } from "$lib/network_stream";
 
-let activities = $state<Activity[]>([]);
+export class ActivitiesState implements ProcessActivity {
+	#activities = $state<Activity[]>([]);
 
-export function getActivities() {
-	return {
-		get all() {
-			return activities;
-		},
-		init(data: Activity[]) {
-			activities = data;
-		},
-		add(activity: Activity) {
-			activities = [...activities, activity];
-		},
-		update(updated: Activity) {
-			activities = activities.map((a) => (a.id === updated.id ? updated : a));
-		},
-		remove(id: number) {
-			activities = activities.filter((a) => a.id !== id);
-		},
-		childrenOf(parentId: number) {
-			return activities.filter((a) => a.parent_id === parentId);
-		},
-	};
+	constructor() {}
+
+	init(data: Activity[]) {
+		this.#activities = data;
+	}
+
+	createActivity(activity: Activity): void {
+		this.#activities.push(activity);
+	}
+
+	updateActivity(updated: Activity): void {
+		this.#activities = this.#activities.map((a) =>
+			a.id === updated.id ? updated : a,
+		);
+	}
+
+	deleteActivity(id: ActivityId): void {
+		this.#activities = this.#activities.filter((a) => a.id !== id);
+	}
+
+	get activities() {
+		return this.#activities;
+	}
 }
 
-export const activityStore = getActivities();
+export const activitiesState = new ActivitiesState();
 
 await getAllActivities().andTee((fixtureActivities) => {
-	activityStore.init(fixtureActivities);
+	activitiesState.init(fixtureActivities);
 });

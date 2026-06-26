@@ -1,21 +1,10 @@
 import { PUBLIC_BASE_URL } from "$env/static/public";
 import { registerGlobalLogger } from "./logger";
-import { NetworkStream, type ProcessActivity } from "./network_stream";
-
-const processActivity: ProcessActivity = {
-	createActivity: (activity) => {
-		logger.log("create activity", activity);
-	},
-	updateActivity: (activity) => {
-		logger.log("update activity", activity);
-	},
-	deleteActivity: (activityId) => {
-		logger.log("delete activity", activityId);
-	},
-};
+import { NetworkStream } from "./network_stream";
+import { activitiesState } from "./states/projects.svelte";
 
 export const networkStream = new NetworkStream(
-	processActivity,
+	activitiesState,
 	`${PUBLIC_BASE_URL}/sse`,
 );
 

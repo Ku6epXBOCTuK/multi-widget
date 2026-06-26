@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Stage from "$cmp/Stage.svelte";
-	import { activityStore } from "$lib/states/projects.svelte";
+	import { activitiesState } from "$lib/states/projects.svelte";
 
-	const activities = activityStore.all;
+	const activities = activitiesState.activities;
 	const currentProject = $derived(
 		activities.find((a) => a.activity_type === "project"),
 	);

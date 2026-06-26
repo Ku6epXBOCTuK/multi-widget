@@ -9,7 +9,8 @@ use axum::{
 };
 use futures_util::stream::{Stream, StreamExt};
 use shared::{
-    Activity, CreateActivityRequest, GetActivityRequest, StreamEvent, UpdateActivityRequest,
+    Activity, ActivityId, CreateActivityRequest, GetActivityRequest, StreamEvent,
+    UpdateActivityRequest,
 };
 use std::{
     convert::Infallible,
@@ -149,7 +150,8 @@ async fn create_activity_handler(State(state): State<Arc<AppState>>, body: Strin
 
     {
         let mut activities = state.activities.lock();
-        let new_activity = Activity::create_from(body_clone);
+        let new_id = activities.iter().map(|act| act.id.0).max().unwrap_or(0) + 1;
+        let new_activity = Activity::create_from(body_clone, ActivityId(new_id));
         activities.push(new_activity);
     }
 
